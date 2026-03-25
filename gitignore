@@ -1,0 +1,10 @@
+# Ignore all database data (user data, not source code)
+Database/*/
+
+# Keep the Database folder itself (tracked via .gitkeep)
+!Database/.gitkeep
+
+# Temp files
+*.tmp
+*.swp
+*~
