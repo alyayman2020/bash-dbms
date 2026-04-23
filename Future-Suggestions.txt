@@ -1,0 +1,2 @@
+What I want to do in the future:
+1. Make a feature that takes Row text and transform it to sql query
