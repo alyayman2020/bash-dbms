@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 # =============================================================================
 # lib/menus.sh — Main Menu & Database Menu
-# Controls the two-level navigation of the DBMS
+# Controls the two-level navigation of the DBMS (ANSI TUI)
 # =============================================================================
 
 
@@ -11,28 +11,35 @@
 # ─────────────────────────────────────────────────────────────────────────────
 main_menu() {
     while :; do
-        choice=$(zenity --list \
-            --title="Bash DBMS — Main Menu" \
-            --text="Choose an operation:" \
-            --column="Action" \
-            --width=400 --height=350 \
-            "Create Database" \
-            "List Databases" \
-            "Connect to Database" \
-            "Drop Database" \
-            "Exit")
+        clear
+        echo -e "${CYAN}${BOLD}=== Bash DBMS — Main Menu ===${NC}"
+        echo -e "Choose an operation:\n"
+        
+        options=(
+            "Create Database"
+            "List Databases"
+            "Connect to Database"
+            "Drop Database"
+            "Backup Database"
+            "Restore Database"
+            "Exit"
+        )
 
-        if [[ -z "$choice" ]]; then
-            exit 0
-        fi
-
-        case $choice in
-            "Create Database")     create_db ;;
-            "List Databases")      list_db ;;
-            "Connect to Database") connect_db ;;
-            "Drop Database")       drop_db ;;
-            "Exit")                exit 0 ;;
-        esac
+        PS3=$'\n'"${YELLOW}Select an option (1-${#options[@]}): ${NC}"
+        select opt in "${options[@]}"; do
+            case $REPLY in
+                1) create_db; break ;;
+                2) list_db; break ;;
+                3) connect_db; break ;;
+                4) drop_db; break ;;
+                5) backup_db; break ;;
+                6) restore_db; break ;;
+                7) exit 0 ;;
+                *) echo -e "${RED}Invalid option.${NC}"; sleep 1; break ;;
+            esac
+        done
+        echo -e "\nPress Enter to continue..."
+        read -r
     done
 }
 
@@ -40,37 +47,44 @@ main_menu() {
 # ─────────────────────────────────────────────────────────────────────────────
 # db_menu
 # The database-level menu. Only accessible after connecting to a database.
-# Shows the current database name in the title bar.
+# Shows the current database name.
 # ─────────────────────────────────────────────────────────────────────────────
 db_menu() {
     while :; do
-        choice=$(zenity --list \
-            --title="Database: $CURRENT_DB" \
-            --text="Choose a table operation:" \
-            --column="Action" \
-            --width=400 --height=420 \
-            "Create Table" \
-            "List Tables" \
-            "Drop Table" \
-            "Insert Into Table" \
-            "Select From Table" \
-            "Delete From Table" \
-            "Update Table" \
-            "Back to Main Menu")
+        clear
+        echo -e "${CYAN}${BOLD}=== Database: ${GREEN}$CURRENT_DB${CYAN} ===${NC}"
+        echo -e "Choose a table operation:\n"
+        
+        options=(
+            "Create Table"
+            "List Tables"
+            "Drop Table"
+            "Insert Into Table"
+            "Select From Table"
+            "Delete From Table"
+            "Update Table"
+            "Export Table to SQL"
+            "Export Table to CSV"
+            "Back to Main Menu"
+        )
 
-        if [[ -z "$choice" ]]; then
-            return
-        fi
-
-        case $choice in
-            "Create Table")      create_table ;;
-            "List Tables")       list_tables ;;
-            "Drop Table")        drop_table ;;
-            "Insert Into Table") insert_into_table ;;
-            "Select From Table") select_from_table ;;
-            "Delete From Table") delete_from_table ;;
-            "Update Table")      update_table ;;
-            "Back to Main Menu") return ;;
-        esac
+        PS3=$'\n'"${YELLOW}Select an option (1-${#options[@]}): ${NC}"
+        select opt in "${options[@]}"; do
+            case $REPLY in
+                1) create_table; break ;;
+                2) list_tables; break ;;
+                3) drop_table; break ;;
+                4) insert_into_table; break ;;
+                5) select_from_table; break ;;
+                6) delete_from_table; break ;;
+                7) update_table; break ;;
+                8) export_to_sql; break ;;
+                9) export_to_csv; break ;;
+                10) return ;;
+                *) echo -e "${RED}Invalid option.${NC}"; sleep 1; break ;;
+            esac
+        done
+        echo -e "\nPress Enter to continue..."
+        read -r
     done
 }

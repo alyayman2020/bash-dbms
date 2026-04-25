@@ -1,2 +1,13 @@
 What I want to do in the future:
-1. Make a feature that takes Row text and transform it to sql query
+
+[x] 1. Make a feature that takes Row text and transform it to sql query (Implemented!)
+[x] 2. Make an ANSI colored Terminal UI (Implemented!)
+
+--- NEW SUGGESTIONS ---
+
+1. Multi-user Authentication: Add a login system so different users can have private databases or read-only access.
+2. Advanced Querying (JOINs): Implement basic JOIN operations to combine data from two tables sharing a common key.
+3. Expanded Data Types: Add support for more data types like `date`, `boolean`, and `auto_increment` integers.
+4. Indexing: Create index files for non-primary key columns to drastically speed up `WHERE` condition searches on large tables.
+5. SQL Command Parser: Allow users to type raw SQL (e.g., `SELECT * FROM users WHERE id=5`) and have the script parse and execute it natively in Bash.
+6. Pagination: Instead of dumping all rows at once for large tables, paginate the results (e.g. show 20 rows per page) using a custom loop or `less`.

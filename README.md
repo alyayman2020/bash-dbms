@@ -3,12 +3,12 @@
 <div align="center">
 
 ![Bash](https://img.shields.io/badge/Bash-5.x-4EAA25?style=flat-square&logo=gnubash&logoColor=white)
-![Zenity](https://img.shields.io/badge/GUI-Zenity-blue?style=flat-square)
+![TUI](https://img.shields.io/badge/UI-ANSI%20TUI-blue?style=flat-square)
 ![Linux](https://img.shields.io/badge/Platform-Linux-FCC624?style=flat-square&logo=linux&logoColor=black)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![ITI](https://img.shields.io/badge/ITI-Data%20Science%20Track-red?style=flat-square)
 
-**A fully functional, file-based DBMS built entirely in Bash with a Zenity GUI.**  
+**A fully functional, file-based DBMS built entirely in Bash with a sleek ANSI Terminal User Interface (TUI).**  
 Created as part of the ITI Data Science Track — Shell Scripting Module.
 
 </div>
@@ -18,10 +18,9 @@ Created as part of the ITI Data Science Track — Shell Scripting Module.
 ## 📌 Overview
 
 This project implements a **Database Management System (DBMS)** from scratch using only
-Bash shell scripting and the Zenity GUI toolkit. It provides a complete two-level menu
-system for managing databases and tables — all stored as plain files on disk.
+Bash shell scripting. It provides a complete two-level menu system via a modern ANSI-colored Terminal User Interface for managing databases and tables — all stored as plain files on disk.
 
-No SQL engine. No external database. Just the filesystem, `sed`, `grep`, `cut`, and Bash.
+No SQL engine. No external database. Just the filesystem, `sed`, `grep`, `awk`, and Bash.
 
 ---
 
@@ -31,9 +30,11 @@ No SQL engine. No external database. Just the filesystem, `sed`, `grep`, `cut`, 
 | Feature | Description |
 |---|---|
 | **Create Database** | Creates a new named directory as a database |
-| **List Databases** | Shows all existing databases in a GUI list |
+| **List Databases** | Shows all existing databases |
 | **Connect to Database** | Opens the database and enters table management mode |
 | **Drop Database** | Deletes a database with confirmation prompt |
+| **Backup Database** | Archives a database into a `.tar.gz` backup file |
+| **Restore Database** | Restores a database from a previous backup archive |
 
 ### 📋 Table-Level Operations
 | Feature | Description |
@@ -45,6 +46,8 @@ No SQL engine. No external database. Just the filesystem, `sed`, `grep`, `cut`, 
 | **Select From Table** | 7 query modes including WHERE condition filter |
 | **Delete From Table** | Remove a row by primary key |
 | **Update Table** | Modify a row's values by primary key |
+| **Export to SQL** | Generates standard `CREATE TABLE` and `INSERT INTO` statements |
+| **Export to CSV** | Converts table data to standard Comma-Separated Values format |
 
 ### 🔍 Select Query Modes
 1. All rows and columns
@@ -55,6 +58,9 @@ No SQL engine. No external database. Just the filesystem, `sed`, `grep`, `cut`, 
 6. Select specific rows AND columns (combined)
 7. **WHERE condition** — filter by primary key value
 
+### 🛡️ Core Enhancements
+- **Audit Logging**: Keeps an automated history of all structural and data-modifying actions inside `dbms.log`.
+
 ---
 
 ## 🏗️ Architecture
@@ -63,14 +69,18 @@ No SQL engine. No external database. Just the filesystem, `sed`, `grep`, `cut`, 
 bash-dbms/
 │
 ├── dbms.sh                  ← Entry point — bootstraps and launches app
+├── dbms.log                 ← Auto-generated audit trail of all operations
 │
 ├── lib/
-│   ├── db_manager.sh        ← Database-level operations (create/list/drop/connect)
-│   ├── table_manager.sh     ← Table-level operations (CRUD + SELECT)
-│   └── menus.sh             ← Main menu & DB menu navigation loops
+│   ├── db_manager.sh        ← DB ops (create/list/drop/connect/backup/restore)
+│   ├── table_manager.sh     ← Table ops (CRUD + SELECT + EXPORT)
+│   └── menus.sh             ← ANSI interactive navigation loops
 │
-├── Database/                ← Auto-created at runtime (stores all databases)
+├── Database/                ← Stores all databases
 │   └── .gitkeep
+│
+├── Backups/                 ← Auto-created to store .tar.gz database backups
+├── exports/                 ← Auto-created to store exported SQL and CSV files
 │
 ├── .gitignore
 ├── LICENSE
@@ -130,13 +140,7 @@ salary:float:nopk
 
 ### Prerequisites
 
-```bash
-# Ubuntu/Debian
-sudo apt install zenity
-
-# Fedora/RHEL
-sudo dnf install zenity
-```
+You only need a standard Linux/macOS/Windows shell environment. No external dependencies or GUI components (like Zenity) are required! 
 
 ### Run
 
@@ -148,35 +152,66 @@ cd bash-dbms
 # Make executable
 chmod +x dbms.sh lib/*.sh
 
-# Launch
+# Launch the Application
 ./dbms.sh
 ```
 
 ---
 
+## 📖 How to Work With the DBMS
+
+When you launch `./dbms.sh`, you will be greeted by the Main Menu. The interface is driven by numerical selections.
+
+1. **Creating a Database:**
+   - From the main menu, type `1` to select **Create Database**.
+   - Enter a name (e.g., `company_db`). 
+
+2. **Connecting to a Database:**
+   - Type `3` for **Connect to Database**.
+   - Select your newly created `company_db` by typing its corresponding number.
+   - You will now be inside the **Database Menu**.
+
+3. **Creating a Table:**
+   - In the Database Menu, select `1` for **Create Table**.
+   - Enter table name (e.g., `users`).
+   - Define columns (e.g., Column 1: `id`, Type: `int`, PK: `y`. Column 2: `username`, Type: `str`).
+
+4. **Managing Data:**
+   - Use **Insert Into Table** (`4`) to add records. The script will automatically prompt you for each column based on your defined datatypes.
+   - Use **Select From Table** (`5`) to query data. The output is cleanly formatted using the `column` command.
+   - Use **Update Table** (`7`) to modify records. You'll need the Primary Key of the row you want to update.
+
+5. **Exporting and Backups:**
+   - You can export table data to SQL or CSV from the Database Menu (`8` and `9`). Check the `exports/` folder for the files.
+   - You can back up your entire database to a zip file from the Main Menu (`5`). Check the `Backups/` folder.
+
+---
+
 ## 📸 Application Flow
 
-```
+```text
 Launch dbms.sh
      │
      ▼
-┌─────────────────────┐
-│     Main Menu       │
-│  ─────────────────  │
-│  Create Database    │
-│  List Databases     │
-│  Connect to DB  ────┼──► ┌──────────────────────┐
-│  Drop Database      │    │   Database Menu       │
-│  Exit               │    │  ──────────────────── │
-└─────────────────────┘    │  Create Table         │
-                           │  List Tables          │
-                           │  Drop Table           │
-                           │  Insert Into Table    │
-                           │  Select From Table    │
-                           │  Delete From Table    │
-                           │  Update Table         │
-                           │  Back to Main Menu    │
-                           └──────────────────────┘
+┌───────────────────────┐
+│       Main Menu       │
+│  ───────────────────  │
+│  1) Create Database   │
+│  2) List Databases    │
+│  3) Connect to DB ────┼──► ┌─────────────────────────┐
+│  4) Drop Database     │    │      Database Menu      │
+│  5) Backup Database   │    │  ─────────────────────  │
+│  6) Restore Database  │    │  1) Create Table        │
+│  7) Exit              │    │  2) List Tables         │
+└───────────────────────┘    │  3) Drop Table          │
+                             │  4) Insert Into Table   │
+                             │  5) Select From Table   │
+                             │  6) Delete From Table   │
+                             │  7) Update Table        │
+                             │  8) Export Table to SQL │
+                             │  9) Export Table to CSV │
+                             │ 10) Back to Main Menu   │
+                             └─────────────────────────┘
 ```
 
 ---
@@ -185,12 +220,12 @@ Launch dbms.sh
 
 | Tool | Purpose |
 |---|---|
-| `bash` | Core scripting language |
-| `zenity` | GUI dialogs (entry, list, question, info, error) |
+| `bash` | Core scripting language & colored TUI interactions |
 | `sed` | In-place row deletion and update |
 | `grep` | Row searching and PK validation |
 | `cut` | Column extraction |
 | `awk` | Metadata parsing |
+| `tar` | Database compression and backup |
 
 ---
 
