@@ -9,8 +9,8 @@
 # create_db
 # ─────────────────────────────────────────────────────────────────────────────
 create_db() {
-    echo -e "${CYAN}=== Create Database ===${NC}"
-    read -p "Enter database name: " DBName
+    gum style --foreground 212 --border normal --padding "0 1" "Create Database"
+    DBName=$(gum input --placeholder "Enter database name" --prompt "Name: ")
 
     [[ -z "$DBName" ]] && return
 
@@ -41,7 +41,7 @@ create_db() {
 # list_db
 # ─────────────────────────────────────────────────────────────────────────────
 list_db() {
-    echo -e "${CYAN}=== Available Databases ===${NC}"
+    gum style --foreground 212 --border normal --padding "0 1" "Available Databases"
     cd "$DB_ROOT" || return
 
     db_list=$(ls -d */ 2>/dev/null | sed 's:/$::')
@@ -59,34 +59,28 @@ list_db() {
 # drop_db
 # ─────────────────────────────────────────────────────────────────────────────
 drop_db() {
-    echo -e "${CYAN}=== Drop Database ===${NC}"
+    gum style --foreground 212 --border normal --padding "0 1" "Drop Database"
     
     cd "$DB_ROOT" || return
     db_list=($(ls -d */ 2>/dev/null | sed 's:/$::'))
 
     if [[ ${#db_list[@]} -eq 0 ]]; then
-        echo -e "${YELLOW}No databases found.${NC}"
+        gum style --foreground 226 "No databases found."
         return
     fi
 
-    PS3=$'\n'"${YELLOW}Select database to drop (1-${#db_list[@]}): ${NC}"
-    select DBName in "${db_list[@]}"; do
-        if [[ -n "$DBName" ]]; then
-            read -p "⚠️ Are you sure you want to delete '$DBName'? (y/n): " confirm
-            if [[ "$confirm" == "y" || "$confirm" == "Y" ]]; then
-                rm -rf "$DB_ROOT/$DBName"
-                [[ "$CURRENT_DB" == "$DBName" ]] && CURRENT_DB=""
-                echo -e "${GREEN}🗑️ Database '$DBName' has been removed.${NC}"
-                log_action "Dropped Database: $DBName"
-            else
-                echo -e "${YELLOW}Operation cancelled.${NC}"
-            fi
-            break
+    DBName=$(gum choose --header "Select database to drop:" "${db_list[@]}")
+    
+    if [[ -n "$DBName" ]]; then
+        if gum confirm "⚠️ Are you sure you want to delete '$DBName'? All data will be lost."; then
+            rm -rf "$DB_ROOT/$DBName"
+            [[ "$CURRENT_DB" == "$DBName" ]] && CURRENT_DB=""
+            gum style --foreground 46 "🗑️ Database '$DBName' has been removed."
+            log_action "Dropped Database: $DBName"
         else
-            echo -e "${RED}Invalid selection.${NC}"
-            break
+            gum style --foreground 226 "Operation cancelled."
         fi
-    done
+    fi
 }
 
 
@@ -94,75 +88,65 @@ drop_db() {
 # connect_db
 # ─────────────────────────────────────────────────────────────────────────────
 connect_db() {
-    echo -e "${CYAN}=== Connect to Database ===${NC}"
+    gum style --foreground 212 --border normal --padding "0 1" "Connect to Database"
     
     cd "$DB_ROOT" || return
     db_list=($(ls -d */ 2>/dev/null | sed 's:/$::'))
 
     if [[ ${#db_list[@]} -eq 0 ]]; then
-        echo -e "${YELLOW}No databases found. Please create one first.${NC}"
+        gum style --foreground 226 "No databases found. Please create one first."
         return
     fi
 
-    PS3=$'\n'"${YELLOW}Select database to connect (1-${#db_list[@]}): ${NC}"
-    select DBName in "${db_list[@]}"; do
-        if [[ -n "$DBName" ]]; then
-            CURRENT_DB="$DBName"
-            echo -e "${GREEN}✅ Connected to database: $CURRENT_DB${NC}"
-            log_action "Connected to Database: $CURRENT_DB"
-            sleep 1
-            db_menu
-            break
-        else
-            echo -e "${RED}Invalid selection.${NC}"
-            break
-        fi
-    done
+    DBName=$(gum choose --header "Select database to connect:" "${db_list[@]}")
+    
+    if [[ -n "$DBName" ]]; then
+        CURRENT_DB="$DBName"
+        gum style --foreground 46 "✅ Connected to database: $CURRENT_DB"
+        log_action "Connected to Database: $CURRENT_DB"
+        sleep 1
+        db_menu
+    fi
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
 # backup_db
 # ─────────────────────────────────────────────────────────────────────────────
 backup_db() {
-    echo -e "${CYAN}=== Backup Database ===${NC}"
+    gum style --foreground 212 --border normal --padding "0 1" "Backup Database"
     
     cd "$DB_ROOT" || return
     db_list=($(ls -d */ 2>/dev/null | sed 's:/$::'))
 
     if [[ ${#db_list[@]} -eq 0 ]]; then
-        echo -e "${YELLOW}No databases found.${NC}"
+        gum style --foreground 226 "No databases found."
         return
     fi
 
-    PS3=$'\n'"${YELLOW}Select database to backup (1-${#db_list[@]}): ${NC}"
-    select DBName in "${db_list[@]}"; do
-        if [[ -n "$DBName" ]]; then
-            BACKUP_DIR="$SCRIPT_DIR/Backups"
-            mkdir -p "$BACKUP_DIR"
-            
-            timestamp=$(date "+%Y%m%d_%H%M%S")
-            backup_file="$BACKUP_DIR/${DBName}_backup_${timestamp}.tar.gz"
-            
-            tar -czf "$backup_file" -C "$DB_ROOT" "$DBName"
-            echo -e "${GREEN}✅ Backup created successfully at: $backup_file${NC}"
-            log_action "Backed up Database: $DBName to $backup_file"
-            break
-        else
-            echo -e "${RED}Invalid selection.${NC}"
-            break
-        fi
-    done
+    DBName=$(gum choose --header "Select database to backup:" "${db_list[@]}")
+    
+    if [[ -n "$DBName" ]]; then
+        BACKUP_DIR="$SCRIPT_DIR/Backups"
+        mkdir -p "$BACKUP_DIR"
+        
+        timestamp=$(date "+%Y%m%d_%H%M%S")
+        backup_file="$BACKUP_DIR/${DBName}_backup_${timestamp}.tar.gz"
+        
+        tar -czf "$backup_file" -C "$DB_ROOT" "$DBName"
+        gum style --foreground 46 "✅ Backup created successfully at:" "$backup_file"
+        log_action "Backed up Database: $DBName to $backup_file"
+    fi
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
 # restore_db
 # ─────────────────────────────────────────────────────────────────────────────
 restore_db() {
-    echo -e "${CYAN}=== Restore Database ===${NC}"
+    gum style --foreground 212 --border normal --padding "0 1" "Restore Database"
     
     BACKUP_DIR="$SCRIPT_DIR/Backups"
     if [[ ! -d "$BACKUP_DIR" ]]; then
-        echo -e "${YELLOW}No backups folder found.${NC}"
+        gum style --foreground 226 "No backups folder found."
         return
     fi
 
@@ -170,25 +154,19 @@ restore_db() {
     backup_list=($(ls *.tar.gz 2>/dev/null))
 
     if [[ ${#backup_list[@]} -eq 0 ]]; then
-        echo -e "${YELLOW}No backup files found.${NC}"
+        gum style --foreground 226 "No backup files found."
         return
     fi
 
-    PS3=$'\n'"${YELLOW}Select backup to restore (1-${#backup_list[@]}): ${NC}"
-    select BackupFile in "${backup_list[@]}"; do
-        if [[ -n "$BackupFile" ]]; then
-            read -p "⚠️ This will overwrite the existing database if it exists. Continue? (y/n): " confirm
-            if [[ "$confirm" == "y" || "$confirm" == "Y" ]]; then
-                tar -xzf "$BackupFile" -C "$DB_ROOT"
-                echo -e "${GREEN}✅ Database restored successfully.${NC}"
-                log_action "Restored Database from: $BackupFile"
-            else
-                echo -e "${YELLOW}Operation cancelled.${NC}"
-            fi
-            break
+    BackupFile=$(gum choose --header "Select backup to restore:" "${backup_list[@]}")
+    
+    if [[ -n "$BackupFile" ]]; then
+        if gum confirm "⚠️ This will overwrite the existing database if it exists. Continue?"; then
+            tar -xzf "$BackupFile" -C "$DB_ROOT"
+            gum style --foreground 46 "✅ Database restored successfully."
+            log_action "Restored Database from: $BackupFile"
         else
-            echo -e "${RED}Invalid selection.${NC}"
-            break
+            gum style --foreground 226 "Operation cancelled."
         fi
-    done
+    fi
 }

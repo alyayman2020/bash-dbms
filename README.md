@@ -3,12 +3,12 @@
 <div align="center">
 
 ![Bash](https://img.shields.io/badge/Bash-5.x-4EAA25?style=flat-square&logo=gnubash&logoColor=white)
-![TUI](https://img.shields.io/badge/UI-ANSI%20TUI-blue?style=flat-square)
+![TUI](https://img.shields.io/badge/UI-Gum%20TUI-ff79c6?style=flat-square)
 ![Linux](https://img.shields.io/badge/Platform-Linux-FCC624?style=flat-square&logo=linux&logoColor=black)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![ITI](https://img.shields.io/badge/ITI-Data%20Science%20Track-red?style=flat-square)
 
-**A fully functional, file-based DBMS built entirely in Bash with a sleek ANSI Terminal User Interface (TUI).**  
+**A fully functional, file-based DBMS built entirely in Bash with a beautiful, modern Gum TUI.**  
 Created as part of the ITI Data Science Track — Shell Scripting Module.
 
 </div>
@@ -140,7 +140,7 @@ salary:float:nopk
 
 ### Prerequisites
 
-You only need a standard Linux/macOS/Windows shell environment. No external dependencies or GUI components (like Zenity) are required! 
+This project uses **Gum** by Charm for its beautiful terminal interface. An installation script is provided to automatically install it for you on supported package managers (APT, Brew, Pacman, DNF).
 
 ### Run
 
@@ -150,11 +150,18 @@ git clone https://github.com/alyayman2020/bash-dbms.git
 cd bash-dbms
 
 # Make executable
-chmod +x dbms.sh lib/*.sh
+chmod +x install.sh dbms.sh lib/*.sh
+
+# Install Dependencies (Gum)
+./install.sh
 
 # Launch the Application
 ./dbms.sh
 ```
+
+### 🎁 Demo Database
+
+When you launch the application for the first time, a default `demo_db` is automatically created with an `employees` table and sample data. You can immediately connect to it and start running queries without having to set up tables manually!
 
 ---
 

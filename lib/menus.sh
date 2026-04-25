@@ -12,34 +12,31 @@
 main_menu() {
     while :; do
         clear
-        echo -e "${CYAN}${BOLD}=== Bash DBMS — Main Menu ===${NC}"
-        echo -e "Choose an operation:\n"
+        gum style \
+            --foreground 212 --border-foreground 212 --border normal \
+            --align center --width 50 --margin "1 2" --padding "1 2" \
+            "Bash DBMS — Main Menu" "Choose an operation:"
         
-        options=(
-            "Create Database"
-            "List Databases"
-            "Connect to Database"
-            "Drop Database"
-            "Backup Database"
-            "Restore Database"
-            "Exit"
-        )
+        choice=$(gum choose --cursor="> " --item.foreground="255" --cursor.foreground="212" \
+            "Create Database" \
+            "List Databases" \
+            "Connect to Database" \
+            "Drop Database" \
+            "Backup Database" \
+            "Restore Database" \
+            "Exit")
 
-        PS3=$'\n'"${YELLOW}Select an option (1-${#options[@]}): ${NC}"
-        select opt in "${options[@]}"; do
-            case $REPLY in
-                1) create_db; break ;;
-                2) list_db; break ;;
-                3) connect_db; break ;;
-                4) drop_db; break ;;
-                5) backup_db; break ;;
-                6) restore_db; break ;;
-                7) exit 0 ;;
-                *) echo -e "${RED}Invalid option.${NC}"; sleep 1; break ;;
-            esac
-        done
-        echo -e "\nPress Enter to continue..."
-        read -r
+        case $choice in
+            "Create Database") create_db ;;
+            "List Databases") list_db ;;
+            "Connect to Database") connect_db ;;
+            "Drop Database") drop_db ;;
+            "Backup Database") backup_db ;;
+            "Restore Database") restore_db ;;
+            "Exit") exit 0 ;;
+        esac
+        
+        gum input --placeholder "Press Enter to continue..." --value "" >/dev/null 2>&1
     done
 }
 
@@ -52,39 +49,36 @@ main_menu() {
 db_menu() {
     while :; do
         clear
-        echo -e "${CYAN}${BOLD}=== Database: ${GREEN}$CURRENT_DB${CYAN} ===${NC}"
-        echo -e "Choose a table operation:\n"
+        gum style \
+            --foreground 117 --border-foreground 117 --border normal \
+            --align center --width 50 --margin "1 2" --padding "1 2" \
+            "Database: $CURRENT_DB" "Choose a table operation:"
         
-        options=(
-            "Create Table"
-            "List Tables"
-            "Drop Table"
-            "Insert Into Table"
-            "Select From Table"
-            "Delete From Table"
-            "Update Table"
-            "Export Table to SQL"
-            "Export Table to CSV"
-            "Back to Main Menu"
-        )
+        choice=$(gum choose --cursor="> " --item.foreground="255" --cursor.foreground="117" \
+            "Create Table" \
+            "List Tables" \
+            "Drop Table" \
+            "Insert Into Table" \
+            "Select From Table" \
+            "Delete From Table" \
+            "Update Table" \
+            "Export Table to SQL" \
+            "Export Table to CSV" \
+            "Back to Main Menu")
 
-        PS3=$'\n'"${YELLOW}Select an option (1-${#options[@]}): ${NC}"
-        select opt in "${options[@]}"; do
-            case $REPLY in
-                1) create_table; break ;;
-                2) list_tables; break ;;
-                3) drop_table; break ;;
-                4) insert_into_table; break ;;
-                5) select_from_table; break ;;
-                6) delete_from_table; break ;;
-                7) update_table; break ;;
-                8) export_to_sql; break ;;
-                9) export_to_csv; break ;;
-                10) return ;;
-                *) echo -e "${RED}Invalid option.${NC}"; sleep 1; break ;;
-            esac
-        done
-        echo -e "\nPress Enter to continue..."
-        read -r
+        case $choice in
+            "Create Table") create_table ;;
+            "List Tables") list_tables ;;
+            "Drop Table") drop_table ;;
+            "Insert Into Table") insert_into_table ;;
+            "Select From Table") select_from_table ;;
+            "Delete From Table") delete_from_table ;;
+            "Update Table") update_table ;;
+            "Export Table to SQL") export_to_sql ;;
+            "Export Table to CSV") export_to_csv ;;
+            "Back to Main Menu") return ;;
+        esac
+        
+        gum input --placeholder "Press Enter to continue..." --value "" >/dev/null 2>&1
     done
 }
